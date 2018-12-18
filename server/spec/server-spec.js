@@ -65,14 +65,21 @@ describe('Persistent Node Chat Server', function() {
     });
   });
 
-  INSERT INTO table(c1,c2,...)
-VALUES (v1,v2,...);
+//   INSERT INTO table(c1,c2,...)
+// VALUES (v1,v2,...);
 
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
-       var queryString = `INSERT INTO messages (text, id_users, id_rooms) VALUES ('Men like you can never change!', 1, 1)`;
-       var queryArgs = [];
-       //check if room exists already, do not create another one
+       var queryString = `INSERT INTO messages (text, id_users, id_rooms) VALUES (?, ?, ?)`;
+       var queryArgs = ['', id_users, 'main'];
+
+
+// BEGIN;
+// INSERT INTO users (username, password)
+//   VALUES('test', 'test');
+// INSERT INTO profiles (userid, bio, homepage)
+//   VALUES(LAST_INSERT_ID(),'Hello world!', 'http://www.stackoverflow.com');
+// COMMIT;
 
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
