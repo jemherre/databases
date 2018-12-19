@@ -5,15 +5,16 @@ module.exports = {
     get: function (req, res) {
       models.messages.get((err,results)=>{
         if(err) throw err;
-        return JSON.stringify(results);
+        res.send(results);
       });
     }, // a function which handles a get request for all messages
     post: function (req, res) {
       //invoke post model
-      var {text, user, roomname} = req.body;
-      models.messages.post(text,user,roomname, (err)=>{
+      var { message, username, roomname } = req.body;
+      models.messages.post(message, username, roomname, (err) => {
         if(err) throw err;
         console.log('MESSAGE POST SUCCESSFUL');
+        res.send();
       });
     } // a function which handles posting a message to the database
   },
@@ -23,14 +24,16 @@ module.exports = {
     get: function (req, res) {
       models.users.get((err,results)=>{
         if(err) throw err;
-        return JSON.stringify(results);
+        res.send(results);
       });
     },
     post: function (req, res) {
-      var user = req.body;
-      models.users.post(user, (err)=>{
+      var { username } = req.body;
+      console.log('user:', username);
+      models.users.post(username, (err) => {
         if(err) throw err;
         console.log('USER POST SUCCESSFUL');
+        res.send(); 
       });
     }
   }

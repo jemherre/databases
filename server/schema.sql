@@ -6,19 +6,14 @@ USE chat;
 
 CREATE TABLE messages (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  text VARCHAR(240),
+  message VARCHAR(240),
   id_users SMALLINT REFERENCES users(id),
-  id_rooms SMALLINT REFERENCES rooms(id)
+  roomname VARCHAR(30)
 );
 
 CREATE TABLE users (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(30)
-);
-
-CREATE TABLE rooms (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(30)
+  username VARCHAR(30)
 );
 
 /* Create other tables and define schemas for them here! */

@@ -3,34 +3,25 @@ var db = require('../db');
 module.exports = {
   messages: {
     get: function (callback) {
-      db.connect((err)=>{
+      console.log('connected in models get');
+      //bring data from all 3 tables, mess, rooms, users
+      var queryString = 'SELECT username, roomname, message FROM messages INNER JOIN users ON users.id = messages.id_users;';
+
+      //join user and messages
+      db.query(queryString, (err, result) =>{
         if(err) return callback(err);
-        console.log('connected in models get');
-        //bring data from all 3 tables, mess, rooms, users
-        var queryString = 'SELECT * FROM messages';
-        db.query(queryString, (err, result)=>{
-          if(err) return callback(err);
-          callback(null, result);
-        });
+        callback(null, result);
       });
+     
     }, // a function which produces all the messages
-    post: function (text, user, roomName, callback) {
-      db.connect((err)=> {
+    post: function (message, username, roomname, callback) {
+
+      var queryString = 'INSERT INTO messages (message, id_users, roomname) VALUES (?,(SELECT id FROM users WHERE username = ?), ?);';
+      var queryArg = [message, username, roomname];
+      db.query(queryString, queryArg, (err)=>{
         if(err) return callback(err);
-        var queryArg =[text, user, roomName];
-        db.query('INSERT INTO rooms (name) VALUES (?)',roomName, (err)=>{
-          if(err) return callback(err);
-          db.query('INSERT INTO users (name) VALUES (?)',user, (err)=>{
-            if(err) return callback(err);
-            var queryString = 'INSERT INTO messages (text, id_users, id_rooms) VALUES (?,(SELECT id FROM users WHERE name = ?),(SELECT id FROM rooms WHERE name = ?))';
-            var queryArg = [text, user, roomName];
-            db.query(queryString, queryArg, (err)=>{
-              if(err) return callback(err);
-              callback();
-            });
-          });
-        });
-      })
+        callback();
+      });
 
     } // a function which can be used to insert a message into the database
   },
@@ -38,20 +29,21 @@ module.exports = {
   users: {
     // Ditto as above.
     get: function (callback) {
-      db.connect((err)=>{
+      console.log('connected in models get');
+      //bring data from all 3 tables, mess, rooms, users
+      var queryString = 'SELECT * FROM users';
+      db.query(queryString, (err, result)=>{
         if(err) callback(err);
-        console.log('connected in models get');
-        //bring data from all 3 tables, mess, rooms, users
-        var queryString = 'SELECT * FROM users';
-        db.query(queryString, (err, result)=>{
-          if(err) callback(err);
-          callback(result);
-        });
+        callback(result);
       });
     },
-    post: function (user, callback) {
-      db.connect((err)=>{
-        db.query('INSERT INTO users (name) VALUES (?)',user, (err)=>{
+    post: function (username, callback) {
+      db.query('SELECT id FROM users WHERE username = ?', username, (err, result) => {
+        if (err) throw err;
+        if (result.length >= 1) {
+          return callback();
+        }
+        db.query('INSERT INTO users (username) VALUES (?)', [username], (err)=>{
           if(err)  callback(err);
             callback();
           });
