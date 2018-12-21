@@ -23,14 +23,12 @@ module.exports = {
     // Ditto as above
     get: function (req, res) {
       models.users.get((err, results) => {
-        // console.log(results[1], results[1].username);
         if (err) { throw err; }
         res.send(results);
       });
     },
     post: function (req, res) {
       var { username } = req.body;
-      console.log('user:', username);
       models.users.post(username, (err) => {
         if (err) {throw err; }
         console.log('USER POST SUCCESSFUL');

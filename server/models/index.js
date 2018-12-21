@@ -46,7 +46,7 @@ module.exports = {
       var queryString = 'SELECT * FROM users';
       db.query(queryString, (err, result) => {
         if (err) { throw err; }
-        callback(result);
+        callback(err,result);
       });
     },
     post: function (username, callback) {
