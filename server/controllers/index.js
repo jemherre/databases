@@ -9,11 +9,11 @@ module.exports = {
       });
     }, // a function which handles a get request for all messages
     post: function (req, res) {
-
+      //invoke post model
       var { message, username, roomname } = req.body;
-
       models.messages.post(message, username, roomname, (err) => {
         if (err) { throw err; }
+        console.log('MESSAGE POST SUCCESSFUL');
         res.send();
       });
     } // a function which handles posting a message to the database
@@ -22,17 +22,20 @@ module.exports = {
   users: {
     // Ditto as above
     get: function (req, res) {
-      models.users.get((err,results) => {
+      models.users.get((err, results) => {
+        // console.log(results[1], results[1].username);
         if (err) { throw err; }
         res.send(results);
       });
     },
     post: function (req, res) {
       var { username } = req.body;
+      console.log('user:', username);
       models.users.post(username, (err) => {
-        res.send();
+        if (err) {throw err; }
+        console.log('USER POST SUCCESSFUL');
+        res.send(); 
       });
     }
   }
 };
-
