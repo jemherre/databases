@@ -53,7 +53,6 @@ describe('Persistent Node Chat Server', function() {
         var queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, function(err, results) {
-          // console.log('results',results);
           // Should have one result:
           expect(results.length).to.equal(1);
 
@@ -68,7 +67,7 @@ describe('Persistent Node Chat Server', function() {
 
   it('Should output all messages from the DB', function(done) {
     // Let's insert a message into the db
-    var queryString = 'INSERT INTO messages (message, roomname, UserId, createdAt, updatedAt) VALUES ("Men like you can never change!", "main", 1, "2018-12-21 02:07:53", "2018-12-21 02:07:53")';
+    var queryString = 'INSERT INTO messages (message, roomname, user_id) VALUES ("Men like you can never change!", "main", 1)';
 
     // TODO - The exact query string and query args to use
     // here depend on the schema you design, so I'll leave
@@ -89,18 +88,22 @@ describe('Persistent Node Chat Server', function() {
 
   it('Should output all users from the DB', function(done) {
     // Let's insert a message into the db
-    var queryString = `INSERT INTO users (username, createdAt, updatedAt) VALUES ('Jason', '2018-12-21 02:07:53', '2018-12-21 02:07:53')`;
-    var length = 0;
-    request('http://127.0.0.1:3000/classes/users', function(error, response, body) {
-      var userList = JSON.parse(body);
-      length = userList.length;
-      dbConnection.query(queryString, function(err) {
-        if (err) { throw err; }
-        request('http://127.0.0.1:3000/classes/users', function(error, response, body) {
-          var newUserList = JSON.parse(body);
-          expect(newUserList.length-1).to.equal(length);
-          done();
-        });
+    var queryString = `INSERT INTO users (username) VALUES ('Jason')`;
+
+    // TODO - The exact query string and query args to use
+    // here depend on the schema you design, so I'll leave
+    // them up to you. */
+    console.log("start query");
+    dbConnection.query(queryString, function(err) {
+      if (err) { throw err; }
+
+      // Now query the Node chat server and see if it returns
+      // the message we just inserted:
+      request('http://127.0.0.1:3000/classes/users', function(error, response, body) {
+        console.log(body);
+        var userList = JSON.parse(body);
+        expect(userList[1].username).to.equal('Jason');
+        done();
       });
     });
   });
@@ -121,7 +124,7 @@ describe('Persistent Node Chat Server', function() {
     }, function(){
       // Now query the Node chat server and see if it returns
       // the message we just inserted:
-      dbConnection.query('SELECT message FROM messages where message = ?',`<body onload=alert('test1')>`,function(err,result){
+      dbConnection.query('SELECT message FROM messages where message=?',`<body onload=alert('test1')>`,function(err,result){
         if (err) { throw err; }
         expect(result.length).to.equal(1);
         done();
@@ -129,53 +132,6 @@ describe('Persistent Node Chat Server', function() {
     });
   });
 
-  //created at sorting
-  it('Should  sort the messages in order by createdAt', function(done) {
 
-    request({
-      method: 'POST',
-      uri: 'http://127.0.0.1:3000/classes/messages',
-      json: {
-        username: 'Valjean',
-        message: `testing sort`,
-        roomname: 'Hello'
-      }
-    }, function(){
-      request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
-        var messageLog = JSON.parse(body);
-        expect(messageLog[0].message).to.equal('testing sort');
-        expect(messageLog[0].roomname).to.equal('Hello');
-        done();
-      });
-    });
-  });
 
-  //filtering by room
-  it('Should  sort the messages in order by createdAt', function(done) {
-    //create post with new room
-
-    request({
-      method: 'POST',
-      uri: 'http://127.0.0.1:3000/classes/messages',
-      json: {
-        username: 'Valjean',
-        message: `testing sort`,
-        roomname: 'crazyRoomName'
-      }
-    }, function(){
-      request({
-        method: 'GET',
-        uri: 'http://127.0.0.1:3000/classes/messages',
-        query: {
-          where: 'crazyRoomName'
-        }
-      },
-      function(error, response, body) {
-        var messageLog = JSON.parse(body);
-        expect(messageLog.length).to.equal(1);
-        // expect(messageLog[0].roomname).to.equal('Hello');
-        done();
-      });
-    });
-  });
 });
