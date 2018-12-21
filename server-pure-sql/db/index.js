@@ -11,3 +11,4 @@ module.exports = mysql.createConnection({
   database: 'chat'
 });
 
+// this comment is only for the commit!
